@@ -1,0 +1,19 @@
+<h2>What do you want to buy?</h2>
+
+<app-stock-symbol-and-amount-input
+  (selectedStockAndAmount)="stockAndAmountSelectionChanged($event)">
+</app-stock-symbol-and-amount-input>
+<ng-container *ngIf="stockAndSymbol.amountInput && stockAndSymbol.symbolInput">
+  <h2>
+    {{
+      'Current price for ' +
+        stockAndSymbol.amountInput +
+        ' pieces of ' +
+        stockAndSymbol.symbolInput
+    }}
+  </h2>
+  <div>
+    {{ '100 USD' }}
+  </div>
+  <button mat-raised-button color="primary">Buy now!</button>
+</ng-container>

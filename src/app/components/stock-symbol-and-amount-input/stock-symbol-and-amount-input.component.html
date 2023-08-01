@@ -1,0 +1,34 @@
+<form [formGroup]="stockInfoForm" class="fifty-fifty">
+  <mat-form-field>
+    <mat-label>Stock</mat-label>
+    <input
+      type="text"
+      placeholder="Choose stock"
+      matInput
+      formControlName="symbolInput"
+      [matAutocomplete]="auto" />
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+      <mat-option
+        *ngFor="let option of filteredStockOptions$ | async"
+        [value]="option">
+        {{ option }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <mat-form-field class="example-form-field">
+    <mat-label>Amount</mat-label>
+    <input
+      matInput
+      placeholder="Choose amount"
+      type="number"
+      formControlName="amountInput" />
+    <button
+      *ngIf="stockInfoForm.controls.amountInput.value"
+      matSuffix
+      mat-icon-button
+      aria-label="Clear"
+      (click)="stockInfoForm.controls.amountInput.setValue(0)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+</form>
