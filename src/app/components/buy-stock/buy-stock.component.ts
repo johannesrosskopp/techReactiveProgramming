@@ -28,6 +28,10 @@ export class BuyStockComponent {
     }
   }
 
+  onReload() {
+    this.loadStockPrice(this.selectedStockAndSymbol!);
+  }
+
   private loadStockPrice(selection: StockSymbolAndAmountFormValue) {
     this.stockPriceDataLoading = true;
     this.stockPriceDataService

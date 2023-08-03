@@ -12,15 +12,18 @@
         ':'
     }}
   </h2>
-  <ng-container *ngIf="stockPriceDataLoading; else showPrice">
-    <div>loading...</div>
-  </ng-container>
-  <ng-template #showPrice>
-    <ng-container *ngIf="stockPriceData">
-      <div>
+  <div class="priceInfoContainer">
+    <ng-container *ngIf="stockPriceDataLoading; else showPrice">
+      <div>loading...</div>
+    </ng-container>
+    <ng-template #showPrice>
+      <div *ngIf="stockPriceData">
         <h3>{{ stockPriceData.price + ' USD' }}</h3>
+        <button mat-raised-button color="primary">Buy now!</button>
       </div>
-      <button mat-raised-button color="primary">Buy now!</button></ng-container
-    >
-  </ng-template>
+    </ng-template>
+    <button mat-mini-fab color="accent" (click)="onReload()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
 </ng-container>
