@@ -12,12 +12,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { BuyStockComponent } from './components/buy-stock/buy-stock.component';
 import { MatButtonModule } from '@angular/material/button';
+import { MessageComponent } from './components/message/message.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     StockSymbolAndAmountInputComponent,
     BuyStockComponent,
+    MessageComponent,
   ],
   imports: [
     BrowserModule,

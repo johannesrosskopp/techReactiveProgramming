@@ -1,0 +1,9 @@
+<div
+  [ngClass]="{
+    info_style: type === 'info',
+    warning_style: type === 'warning',
+    error_style: type === 'error'
+  }">
+  <mat-icon>{{ typeToIconMap[type] }}</mat-icon>
+  {{ message }}
+</div>

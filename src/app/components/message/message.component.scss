@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  color: #000000;
+
+  margin-bottom: 10px;
+
+  div {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border-radius: 5px;
+    padding: 10px;
+
+    mat-icon {
+      margin-right: 10px;
+    }
+  }
+  .info_style {
+    background-color: #6ad4ef;
+  }
+
+  .warning_style {
+    background-color: #eab918;
+  }
+
+  .error_style {
+    background-color: #f0515e;
+  }
+}

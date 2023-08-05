@@ -38,8 +38,8 @@ export class StockPriceDataService {
       price: singlePrice * amount,
     };
 
-    const fakeDelay = Math.random() * 1000;
+    const fakeDelayMs = Math.random() * 1000;
 
-    return of(stockPriceData).pipe(delay(fakeDelay));
+    return of(stockPriceData).pipe(delay(fakeDelayMs));
   }
 }

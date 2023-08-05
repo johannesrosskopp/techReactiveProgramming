@@ -4,6 +4,7 @@ import {
   StockPriceData,
   StockPriceDataService,
 } from 'src/app/services/stock-price-data.service';
+import { AccountService } from 'src/app/services/account.service';
 
 @Component({
   selector: 'app-buy-stock',
@@ -13,9 +14,13 @@ import {
 export class BuyStockComponent {
   selectedStockAndSymbol: StockSymbolAndAmountFormValue | null = null;
   stockPriceData: StockPriceData | null = null;
-  stockPriceDataLoading: boolean = false;
+  showLoading: boolean = false;
+  showAmountNotAvailableWarning: boolean = false;
 
-  constructor(readonly stockPriceDataService: StockPriceDataService) {}
+  constructor(
+    private readonly stockPriceDataService: StockPriceDataService,
+    private readonly accountService: AccountService
+  ) {}
 
   stockAndAmountSelectionChanged(
     selection: StockSymbolAndAmountFormValue | null
@@ -33,12 +38,19 @@ export class BuyStockComponent {
   }
 
   private loadStockPrice(selection: StockSymbolAndAmountFormValue) {
-    this.stockPriceDataLoading = true;
+    this.showLoading = true;
+    this.showAmountNotAvailableWarning = false;
     this.stockPriceDataService
       .getStockPriceData(selection.symbolInput, selection.amountInput)
       .subscribe(stockPriceData => {
         this.stockPriceData = stockPriceData;
-        this.stockPriceDataLoading = false;
+
+        this.accountService
+          .isAmountAvailable(stockPriceData.price)
+          .subscribe(isAmountAvailable => {
+            this.showLoading = false;
+            this.showAmountNotAvailableWarning = !isAmountAvailable;
+          });
       });
   }
 }
