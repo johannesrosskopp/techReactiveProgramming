@@ -18,7 +18,9 @@
     </ng-container>
     <ng-template #showPrice>
       <div *ngIf="stockPriceData">
-        <h3>{{ stockPriceData.price + ' USD' }}</h3>
+        <h3 style="font-weight: bold">
+          {{ stockPriceData.price | currency: 'USD' }}
+        </h3>
         <app-message
           *ngIf="showAmountNotAvailableWarning"
           [type]="'warning'"

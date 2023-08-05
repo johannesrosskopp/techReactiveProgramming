@@ -17,17 +17,20 @@
   </mat-form-field>
   <mat-form-field class="example-form-field">
     <mat-label>Amount</mat-label>
-    <input
-      matInput
-      placeholder="Choose amount"
-      type="number"
-      formControlName="amountInput" />
-    <button
-      *ngIf="stockInfoForm.controls.amountInput.value"
-      matSuffix
-      mat-icon-button
-      (click)="stockInfoForm.controls.amountInput.reset()">
-      <mat-icon>close</mat-icon>
-    </button>
+    <input matInput placeholder="Choose amount" formControlName="amountInput" />
+    <span matSuffix>
+      <button
+        *ngIf="stockInfoForm.controls.amountInput.value"
+        mat-icon-button
+        (click)="stockInfoForm.controls.amountInput.reset()">
+        <mat-icon>close</mat-icon>
+      </button>
+      <button mat-icon-button (click)="onPlusClick($event)">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button mat-icon-button (click)="onMinusClick($event)">
+        <mat-icon>remove</mat-icon>
+      </button>
+    </span>
   </mat-form-field>
 </form>

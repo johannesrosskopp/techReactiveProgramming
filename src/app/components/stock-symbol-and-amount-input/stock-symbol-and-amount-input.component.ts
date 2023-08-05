@@ -57,6 +57,21 @@ export class StockSymbolAndAmountInputComponent implements OnInit {
       console.log('form status changed to: ', status);
     });
   }
+
+  onMinusClick(event: MouseEvent): void {
+    this.stockInfoForm.controls.amountInput.setValue(
+      (this.stockInfoForm.controls.amountInput.value || 0) - 1
+    );
+    event.stopPropagation();
+  }
+
+  onPlusClick(event: MouseEvent): void {
+    this.stockInfoForm.controls.amountInput.setValue(
+      (this.stockInfoForm.controls.amountInput.value || 0) + 1
+    );
+    event.stopPropagation();
+  }
+
   private filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
