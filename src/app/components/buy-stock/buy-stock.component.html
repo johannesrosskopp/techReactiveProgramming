@@ -1,14 +1,14 @@
 <h2>What do you want to buy?</h2>
 <app-stock-symbol-and-amount-input
-  (selectedStockAndAmount)="stockAndAmountSelectionChanged($event)">
+  (selectedStockAndAmount)="stockAndAmountSelectionSubject.next($event)">
 </app-stock-symbol-and-amount-input>
-<ng-container *ngIf="selectedStockAndSymbol">
+<ng-container *ngIf="selectedStockAndAmount">
   <h2>
     {{
       'Current price for ' +
-        selectedStockAndSymbol.amountInput +
+        selectedStockAndAmount.amountInput +
         ' pieces of ' +
-        selectedStockAndSymbol.symbolInput +
+        selectedStockAndAmount.symbolInput +
         ':'
     }}
   </h2>
@@ -37,7 +37,7 @@
           "></app-message>
       </div>
     </div>
-    <button mat-mini-fab color="primary" (click)="onReload()">
+    <button mat-mini-fab color="primary" (click)="reloadSubject.next()">
       <mat-icon>refresh</mat-icon>
     </button>
   </div>
