@@ -13,23 +13,30 @@
     }}
   </h2>
   <div class="priceInfoContainer">
-    <ng-container *ngIf="showLoading; else showPrice">
-      <div>loading...</div>
-    </ng-container>
-    <ng-template #showPrice>
-      <div *ngIf="stockPriceData">
-        <h3 style="font-weight: bold">
+    <div>
+      <ng-container *ngIf="isPriceLoading; else showPrice">
+        <h3 style="font-weight: lighter">loading...</h3>
+      </ng-container>
+      <ng-template #showPrice>
+        <h3 *ngIf="stockPriceData" style="font-weight: bold">
           {{ stockPriceData.price | currency: 'USD' }}
         </h3>
+      </ng-template>
+      <div class="buyContainer">
+        <button
+          mat-raised-button
+          color="primary"
+          [disabled]="isAmountAvailbilityLoading || isPriceLoading">
+          {{ isAmountAvailbilityLoading ? 'Checking...' : 'Buy now!' }}
+        </button>
         <app-message
           *ngIf="showAmountNotAvailableWarning"
           [type]="'warning'"
           [message]="
             'You might not have enough money on your account!'
           "></app-message>
-        <button mat-raised-button color="primary">Buy now!</button>
       </div>
-    </ng-template>
+    </div>
     <button mat-mini-fab color="primary" (click)="onReload()">
       <mat-icon>refresh</mat-icon>
     </button>

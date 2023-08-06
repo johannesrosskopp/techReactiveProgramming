@@ -8,7 +8,7 @@ export class AccountService {
   constructor() {}
 
   private readonly FAKE_AVAILABLE_AMOUNT = 1000;
-  private readonly FAKE_DELAY_MS = 100;
+  private readonly FAKE_DELAY_MS = 1000;
 
   isAmountAvailable(amount: number): Observable<boolean> {
     const isAmountAvailable = amount <= this.FAKE_AVAILABLE_AMOUNT;

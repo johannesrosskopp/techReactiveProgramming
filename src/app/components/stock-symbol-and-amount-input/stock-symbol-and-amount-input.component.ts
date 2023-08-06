@@ -87,8 +87,7 @@ export class StockSymbolAndAmountInputComponent implements OnInit {
         return status === 'VALID'
           ? this.stockInfoForm.valueChanges.pipe(
               startWith(this.stockInfoForm.value),
-              map(value => value as StockSymbolAndAmountFormValue),
-              distinctUntilChanged()
+              map(value => value as StockSymbolAndAmountFormValue)
             )
           : of(null);
       })

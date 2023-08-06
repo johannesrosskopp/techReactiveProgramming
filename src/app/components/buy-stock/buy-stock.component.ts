@@ -14,8 +14,9 @@ import { AccountService } from 'src/app/services/account.service';
 export class BuyStockComponent {
   selectedStockAndSymbol: StockSymbolAndAmountFormValue | null = null;
   stockPriceData: StockPriceData | null = null;
-  showLoading: boolean = false;
+  isPriceLoading: boolean = false;
   showAmountNotAvailableWarning: boolean = false;
+  isAmountAvailbilityLoading: boolean = false;
 
   constructor(
     private readonly stockPriceDataService: StockPriceDataService,
@@ -38,19 +39,24 @@ export class BuyStockComponent {
   }
 
   private loadStockPrice(selection: StockSymbolAndAmountFormValue) {
-    this.showLoading = true;
+    this.isPriceLoading = true;
     this.showAmountNotAvailableWarning = false;
     this.stockPriceDataService
       .getStockPriceData(selection.symbolInput, selection.amountInput)
       .subscribe(stockPriceData => {
         this.stockPriceData = stockPriceData;
+        this.isPriceLoading = false;
+        this.loadAmountAvailability(stockPriceData.price);
+      });
+  }
 
-        this.accountService
-          .isAmountAvailable(stockPriceData.price)
-          .subscribe(isAmountAvailable => {
-            this.showLoading = false;
-            this.showAmountNotAvailableWarning = !isAmountAvailable;
-          });
+  private loadAmountAvailability(amount: number) {
+    this.isAmountAvailbilityLoading = true;
+    this.accountService
+      .isAmountAvailable(amount)
+      .subscribe(isAmountAvailable => {
+        this.showAmountNotAvailableWarning = !isAmountAvailable;
+        this.isAmountAvailbilityLoading = false;
       });
   }
 }
