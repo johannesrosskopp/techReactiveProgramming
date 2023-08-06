@@ -41,12 +41,45 @@ export class BuyStockComponent {
   private loadStockPrice(selection: StockSymbolAndAmountFormValue) {
     this.isPriceLoading = true;
     this.showAmountNotAvailableWarning = false;
+    this.parallelLoadPriceFromSIXAndXETRA(selection);
+  }
+
+  private parallelLoadPriceFromSIXAndXETRA(
+    selection: StockSymbolAndAmountFormValue
+  ) {
+    let sixLoading = true;
+    let xetraLoading = true;
+
     this.stockPriceDataService
-      .getStockPriceData(selection.symbolInput, selection.amountInput)
-      .subscribe(stockPriceData => {
-        this.stockPriceData = stockPriceData;
-        this.isPriceLoading = false;
-        this.loadAmountAvailability(stockPriceData.price);
+      .getPriceFromSIX(selection.symbolInput, selection.amountInput)
+      .subscribe(loadedStockPriceData => {
+        if (xetraLoading) {
+          this.stockPriceData = loadedStockPriceData;
+          sixLoading = false;
+        } else {
+          this.stockPriceData =
+            loadedStockPriceData.price < this.stockPriceData!.price
+              ? loadedStockPriceData
+              : this.stockPriceData;
+          this.isPriceLoading = false;
+          this.loadAmountAvailability(this.stockPriceData!.price);
+        }
+      });
+
+    this.stockPriceDataService
+      .getPriceFromXETRA(selection.symbolInput, selection.amountInput)
+      .subscribe(loadedStockPriceData => {
+        if (sixLoading) {
+          this.stockPriceData = loadedStockPriceData;
+          xetraLoading = false;
+        } else {
+          this.stockPriceData =
+            loadedStockPriceData.price < this.stockPriceData!.price
+              ? loadedStockPriceData
+              : this.stockPriceData;
+          this.isPriceLoading = false;
+          this.loadAmountAvailability(this.stockPriceData!.price);
+        }
       });
   }
 

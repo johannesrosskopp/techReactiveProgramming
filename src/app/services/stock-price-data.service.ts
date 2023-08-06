@@ -23,7 +23,21 @@ const stockToPriceRange: { [K in StockSymbol]: { min: number; max: number } } =
 export class StockPriceDataService {
   constructor() {}
 
-  getStockPriceData(
+  getPriceFromSIX(
+    symbol: StockSymbol,
+    amount: number
+  ): Observable<StockPriceData> {
+    return this.getStockPriceData(symbol, amount);
+  }
+
+  getPriceFromXETRA(
+    symbol: StockSymbol,
+    amount: number
+  ): Observable<StockPriceData> {
+    return this.getStockPriceData(symbol, amount);
+  }
+
+  private getStockPriceData(
     symbol: StockSymbol,
     amount: number
   ): Observable<StockPriceData> {
