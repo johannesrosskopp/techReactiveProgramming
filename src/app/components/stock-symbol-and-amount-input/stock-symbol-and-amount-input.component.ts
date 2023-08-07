@@ -1,21 +1,26 @@
 import { Component, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import {
-  Observable,
-  combineLatest,
-  distinct,
-  distinctUntilChanged,
-  filter,
-  map,
-  of,
-  startWith,
-  switchMap,
-} from 'rxjs';
+  AbstractControl,
+  FormControl,
+  FormGroup,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { Observable, map, startWith } from 'rxjs';
 import { StockSymbol, stockOptions } from 'src/app/constants/availableStocks';
 
 interface StockSymbolAndAmountForm {
   symbolInput: FormControl<StockSymbol | null>;
   amountInput: FormControl<number | null>;
+}
+
+function hasOptionSelectedValidator(options: typeof stockOptions): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    if (options.indexOf(control.value) !== -1) {
+      return null; /* valid option selected */
+    }
+    return { invalidAutocompleteString: { value: control.value } };
+  };
 }
 
 export type StockSymbolAndAmountFormValue = {
@@ -31,7 +36,10 @@ export class StockSymbolAndAmountInputComponent implements OnInit {
   stockInfoForm = new FormGroup<StockSymbolAndAmountForm>({
     symbolInput: new FormControl(null, {
       nonNullable: false,
-      validators: [Validators.required],
+      validators: [
+        Validators.required,
+        hasOptionSelectedValidator(stockOptions),
+      ],
     }),
     amountInput: new FormControl(null, {
       nonNullable: false,
@@ -81,16 +89,13 @@ export class StockSymbolAndAmountInputComponent implements OnInit {
   }
 
   private getFormValueOrNull(): Observable<StockSymbolAndAmountFormValue | null> {
-    return this.stockInfoForm.statusChanges.pipe(
-      distinctUntilChanged(),
-      switchMap(status => {
-        return status === 'VALID'
-          ? this.stockInfoForm.valueChanges.pipe(
-              startWith(this.stockInfoForm.value),
-              map(value => value as StockSymbolAndAmountFormValue)
-            )
-          : of(null);
-      })
+    return this.stockInfoForm.valueChanges.pipe(
+      startWith(this.stockInfoForm.value),
+      map(formValue =>
+        this.stockInfoForm.status === 'VALID'
+          ? (formValue as StockSymbolAndAmountFormValue)
+          : null
+      )
     );
   }
 }
