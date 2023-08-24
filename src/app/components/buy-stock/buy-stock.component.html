@@ -1,6 +1,6 @@
 <h2>What do you want to buy?</h2>
 <app-stock-symbol-and-amount-input
-  (selectedStockAndAmount)="stockAndAmountSelectionSubject.next($event)">
+  (selectedStockAndAmount)="onStockAndAmountSelectionChange($event)">
 </app-stock-symbol-and-amount-input>
 <ng-container *ngIf="selectedStockAndAmount">
   <h2>
@@ -11,34 +11,8 @@
         selectedStockAndAmount.symbolInput +
         ':'
     }}
-  </h2>
-  <div class="priceInfoContainer">
-    <div>
-      <ng-container *ngIf="isPriceLoading; else showPrice">
-        <h3 style="font-weight: lighter">loading...</h3>
-      </ng-container>
-      <ng-template #showPrice>
-        <h3 *ngIf="stockPriceData" style="font-weight: bold">
-          {{ stockPriceData.price | currency: 'USD' }}
-        </h3>
-      </ng-template>
-      <div class="buyContainer">
-        <button
-          mat-raised-button
-          color="primary"
-          [disabled]="isAmountAvailbilityLoading || isPriceLoading">
-          {{ isAmountAvailbilityLoading ? 'Checking...' : 'Buy now!' }}
-        </button>
-        <app-message
-          *ngIf="showAmountNotAvailableWarning"
-          [type]="'warning'"
-          [message]="
-            'You might not have enough money on your account!'
-          "></app-message>
-      </div>
-    </div>
-    <button mat-mini-fab color="primary" (click)="reloadSubject.next()">
-      <mat-icon>refresh</mat-icon>
+    <button mat-icon-button color="primary" (click)="onSearchStockBtnClicked()">
+      <mat-icon>open_in_new</mat-icon>
     </button>
-  </div>
+  </h2>
 </ng-container>

@@ -1,27 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { StockSymbolAndAmountFormValue } from '../stock-symbol-and-amount-input/stock-symbol-and-amount-input.component';
-import {
-  StockPriceData,
-  StockPriceDataService,
-} from 'src/app/services/stock-price-data.service';
-import { AccountService } from 'src/app/services/account.service';
-import {
-  BehaviorSubject,
-  Observable,
-  ReplaySubject,
-  Subject,
-  catchError,
-  combineLatest,
-  finalize,
-  forkJoin,
-  map,
-  of,
-  share,
-  shareReplay,
-  switchMap,
-  tap,
-  throwError,
-} from 'rxjs';
 
 @Component({
   selector: 'app-buy-stock',
@@ -30,92 +8,28 @@ import {
 })
 export class BuyStockComponent implements OnInit {
   selectedStockAndAmount: StockSymbolAndAmountFormValue | null = null;
-  stockPriceData: StockPriceData | null = null;
-  showAmountNotAvailableWarning: boolean = false;
 
-  isAmountAvailbilityLoading: boolean = false;
-  isPriceLoading: boolean = false;
+  // TODO create a subject that will hold the selected stock and amount
+  // private readonly stockAndAmountSelectionSubject =
 
-  readonly stockAndAmountSelectionSubject =
-    new ReplaySubject<StockSymbolAndAmountFormValue | null>(1);
+  constructor() {}
 
-  readonly reloadSubject = new BehaviorSubject<void>(undefined);
-
-  constructor(
-    private readonly stockPriceDataService: StockPriceDataService,
-    private readonly accountService: AccountService
-  ) {}
-
-  stockPriceData$: Observable<StockPriceData | null> = combineLatest([
-    this.stockAndAmountSelectionSubject,
-    this.reloadSubject,
-  ]).pipe(
-    tap(() => {
-      this.showAmountNotAvailableWarning = false;
-    }),
-    switchMap(([selection, _]) =>
-      selection ? this.loadStockPrice(selection) : of(null)
-    ),
-    share()
-  );
-
-  showAmountNotAvailableWarning$: Observable<boolean> =
-    this.stockPriceData$.pipe(
-      switchMap(stockPriceData =>
-        stockPriceData
-          ? this.loadAmountAvailability(stockPriceData.price).pipe(
-              map(isAmountAvailable => !isAmountAvailable)
-            )
-          : of(false)
-      )
-    );
-
+  // TODO remove this eslint-disabler
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit() {
-    this.stockAndAmountSelectionSubject.subscribe(selectedStockAndAmount => {
-      this.selectedStockAndAmount = selectedStockAndAmount;
-    });
-
-    this.stockPriceData$.subscribe(stockPriceData => {
-      this.stockPriceData = stockPriceData;
-    });
-
-    this.showAmountNotAvailableWarning$.subscribe(
-      showAmountNotAvailableWarning => {
-        this.showAmountNotAvailableWarning = showAmountNotAvailableWarning;
-      }
-    );
+    // TODO subscribe to the subject and update the 'selectedStockAndAmount' variable
   }
 
-  private loadStockPrice(
-    selection: StockSymbolAndAmountFormValue
-  ): Observable<StockPriceData> {
-    this.isPriceLoading = true;
-
-    return forkJoin([
-      this.stockPriceDataService.getPriceFromSIX(
-        selection.symbolInput,
-        selection.amountInput
-      ),
-      this.stockPriceDataService.getPriceFromXETRA(
-        selection.symbolInput,
-        selection.amountInput
-      ),
-    ]).pipe(
-      map(([sixPrice, xetraPrice]) =>
-        sixPrice.price < xetraPrice.price ? sixPrice : xetraPrice
-      ),
-      tap(() => {
-        this.isPriceLoading = false;
-      })
-    );
+  onStockAndAmountSelectionChange(
+    selection: StockSymbolAndAmountFormValue | null
+  ) {
+    // TODO insert the selection into the subject
   }
 
-  private loadAmountAvailability(amount: number): Observable<boolean> {
-    this.isAmountAvailbilityLoading = true;
-    return this.accountService.isAmountAvailable(amount).pipe(
-      tap(() => {
-        this.isAmountAvailbilityLoading = false;
-      })
-    );
+  onSearchStockBtnClicked() {
+    // TODO subscribe to the subject limited to one emission (take(1)) and use following code to open a new tab with the google search
+    // window.open(
+    //   `https://www.google.com/search?q=${selectedStockAndAmount?.symbolInput}`
+    // );
   }
 }
