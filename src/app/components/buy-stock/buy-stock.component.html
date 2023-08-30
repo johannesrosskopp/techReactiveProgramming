@@ -19,5 +19,8 @@
     <h3 *ngIf="stockPriceData" style="font-weight: bold">
       {{ stockPriceData.price | currency: 'USD' }}
     </h3>
+    <button mat-mini-fab color="primary" (click)="reloadSubject.next()">
+      <mat-icon>refresh</mat-icon>
+    </button>
   </div>
 </ng-container>

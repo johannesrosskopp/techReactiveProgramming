@@ -1,6 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { StockSymbolAndAmountFormValue } from '../stock-symbol-and-amount-input/stock-symbol-and-amount-input.component';
-import { Observable, ReplaySubject, of, switchMap, take } from 'rxjs';
+import {
+  BehaviorSubject,
+  Observable,
+  ReplaySubject,
+  combineLatest,
+  forkJoin,
+  map,
+  of,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs';
 import {
   StockPriceDataService,
   StockPriceData,
@@ -18,8 +29,10 @@ export class BuyStockComponent implements OnInit {
   private readonly stockAndAmountSelectionSubject =
     new ReplaySubject<StockSymbolAndAmountFormValue | null>(1);
 
-  // Notice how the service is injected into the component.
-  // It is now available just like class variable. Thx Typescript and Angular! :)
+  // Notice that we have new subject.
+  // The 'next' call to insert the 'reload clicked' event is already done for you (in the template).
+  readonly reloadSubject = new BehaviorSubject<void>(undefined);
+
   constructor(private readonly stockPriceDataService: StockPriceDataService) {}
 
   ngOnInit() {
@@ -27,10 +40,10 @@ export class BuyStockComponent implements OnInit {
       this.selectedStockAndAmount = selectedStockAndAmount;
     });
 
-    // TODO use stockPriceDataService and an async mapper to load the stock price from SIX
-    // then subscribe and set the stockPriceData variable
+    // TODO: choose a combiner to combine the stockAndAmountSelectionSubject and reloadSubject
     this.stockAndAmountSelectionSubject
       .pipe(
+        // TODO: adjust the switchMap. It should receive an array of values now!
         switchMap(selection =>
           selection ? this.loadStockPrice(selection) : of(null)
         )
@@ -60,6 +73,7 @@ export class BuyStockComponent implements OnInit {
   private loadStockPrice(
     selection: StockSymbolAndAmountFormValue
   ): Observable<StockPriceData> {
+    // TODO: additionally load the price from XETRA and return the lower price of the two
     return this.stockPriceDataService.getPriceFromSIX(
       selection.symbolInput,
       selection.amountInput
