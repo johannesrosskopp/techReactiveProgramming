@@ -29,8 +29,15 @@ export class BuyStockComponent implements OnInit {
 
     // TODO use stockPriceDataService and an async mapper to load the stock price from SIX
     // then subscribe and set the stockPriceData variable
-    // this.stockAndAmountSelectionSubject
-    //   .pipe(
+    this.stockAndAmountSelectionSubject
+      .pipe(
+        switchMap(selection =>
+          selection ? this.loadStockPrice(selection) : of(null)
+        )
+      )
+      .subscribe(stockPriceData => {
+        this.stockPriceData = stockPriceData;
+      });
   }
 
   onStockAndAmountSelectionChange(
@@ -48,5 +55,14 @@ export class BuyStockComponent implements OnInit {
           `https://www.google.com/search?q=${selectedStockAndAmount?.symbolInput}`
         );
       });
+  }
+
+  private loadStockPrice(
+    selection: StockSymbolAndAmountFormValue
+  ): Observable<StockPriceData> {
+    return this.stockPriceDataService.getPriceFromSIX(
+      selection.symbolInput,
+      selection.amountInput
+    );
   }
 }
