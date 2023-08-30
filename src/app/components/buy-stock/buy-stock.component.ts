@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { StockSymbolAndAmountFormValue } from '../stock-symbol-and-amount-input/stock-symbol-and-amount-input.component';
-import { BehaviorSubject, ReplaySubject, Subject, take } from 'rxjs';
+import { Observable, ReplaySubject, of, switchMap, take } from 'rxjs';
+import {
+  StockPriceDataService,
+  StockPriceData,
+} from 'src/app/services/stock-price-data.service';
 
 @Component({
   selector: 'app-buy-stock',
@@ -9,31 +13,33 @@ import { BehaviorSubject, ReplaySubject, Subject, take } from 'rxjs';
 })
 export class BuyStockComponent implements OnInit {
   selectedStockAndAmount: StockSymbolAndAmountFormValue | null = null;
+  stockPriceData: StockPriceData | null = null;
 
-  // create a subject that will hold the selected stock and amount
   private readonly stockAndAmountSelectionSubject =
     new ReplaySubject<StockSymbolAndAmountFormValue | null>(1);
 
-  constructor() {}
+  // Notice how the service is injected into the component.
+  // It is now available just like class variable. Thx Typescript and Angular! :)
+  constructor(private readonly stockPriceDataService: StockPriceDataService) {}
 
-  // remove this eslint-disabler
-  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit() {
-    // subscribe to the subject and update the 'selectedStockAndAmount' variable
     this.stockAndAmountSelectionSubject.subscribe(selectedStockAndAmount => {
       this.selectedStockAndAmount = selectedStockAndAmount;
     });
+
+    // TODO use stockPriceDataService and an async mapper to load the stock price from SIX
+    // then subscribe and set the stockPriceData variable
+    // this.stockAndAmountSelectionSubject
+    //   .pipe(
   }
 
   onStockAndAmountSelectionChange(
     selection: StockSymbolAndAmountFormValue | null
   ) {
-    // insert the selection into the subject
     this.stockAndAmountSelectionSubject.next(selection);
   }
 
   onSearchStockBtnClicked() {
-    // subscribe to the subject limited to one emission (take(1)) and use following code to open a new tab with the google search
     this.stockAndAmountSelectionSubject
       .pipe(take(1))
       .subscribe(selectedStockAndAmount => {
