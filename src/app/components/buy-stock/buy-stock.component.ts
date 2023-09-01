@@ -10,7 +10,6 @@ import {
   of,
   switchMap,
   take,
-  tap,
 } from 'rxjs';
 import {
   StockPriceDataService,
@@ -41,10 +40,10 @@ export class BuyStockComponent implements OnInit {
     });
 
     // TODO: choose a combiner to combine the stockAndAmountSelectionSubject and reloadSubject
-    this.stockAndAmountSelectionSubject
+    combineLatest([this.stockAndAmountSelectionSubject, this.reloadSubject])
       .pipe(
         // TODO: adjust the switchMap. It should receive an array of values now!
-        switchMap(selection =>
+        switchMap(([selection, _]) =>
           selection ? this.loadStockPrice(selection) : of(null)
         )
       )
@@ -74,9 +73,19 @@ export class BuyStockComponent implements OnInit {
     selection: StockSymbolAndAmountFormValue
   ): Observable<StockPriceData> {
     // TODO: additionally load the price from XETRA and return the lower price of the two
-    return this.stockPriceDataService.getPriceFromSIX(
-      selection.symbolInput,
-      selection.amountInput
+    return forkJoin([
+      this.stockPriceDataService.getPriceFromSIX(
+        selection.symbolInput,
+        selection.amountInput
+      ),
+      this.stockPriceDataService.getPriceFromXETRA(
+        selection.symbolInput,
+        selection.amountInput
+      ),
+    ]).pipe(
+      map(([sixPrice, xetraPrice]) =>
+        sixPrice.price < xetraPrice.price ? sixPrice : xetraPrice
+      )
     );
   }
 }
