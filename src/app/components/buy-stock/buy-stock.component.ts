@@ -2,14 +2,18 @@ import { Component, OnInit } from '@angular/core';
 import { StockSymbolAndAmountFormValue } from '../stock-symbol-and-amount-input/stock-symbol-and-amount-input.component';
 import {
   BehaviorSubject,
+  EMPTY,
   Observable,
   ReplaySubject,
+  catchError,
   combineLatest,
+  finalize,
   forkJoin,
   map,
   of,
   switchMap,
   take,
+  tap,
 } from 'rxjs';
 import {
   StockPriceDataService,
@@ -46,7 +50,11 @@ export class BuyStockComponent implements OnInit {
       .pipe(
         switchMap(([selection, _]) =>
           selection ? this.loadStockPrice(selection) : of(null)
-        )
+        ),
+        catchError(err => {
+          console.error('Fatal error occured, please reload!');
+          return of(null);
+        })
       )
       .subscribe(stockPriceData => {
         this.stockPriceData = stockPriceData;
@@ -72,9 +80,9 @@ export class BuyStockComponent implements OnInit {
 
   private loadStockPrice(
     selection: StockSymbolAndAmountFormValue
-  ): Observable<StockPriceData> {
+  ): Observable<StockPriceData | null> {
     return forkJoin([
-      this.stockPriceDataService.getPriceFromSIX(
+      this.stockPriceDataService.getPriceFromSIXWithError(
         selection.symbolInput,
         selection.amountInput
       ),
@@ -83,9 +91,21 @@ export class BuyStockComponent implements OnInit {
         selection.amountInput
       ),
     ]).pipe(
+      tap({
+        subscribe: () => {
+          this.isPriceLoading = true;
+        },
+      }),
       map(([sixPrice, xetraPrice]) =>
         sixPrice.price < xetraPrice.price ? sixPrice : xetraPrice
-      )
+      ),
+      catchError(err => {
+        console.error('Loading stock price failed: ', err);
+        return of(null);
+      }),
+      finalize(() => {
+        this.isPriceLoading = false;
+      })
     );
   }
 }
