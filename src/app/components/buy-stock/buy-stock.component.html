@@ -16,9 +16,14 @@
     </button>
   </h2>
   <div class="priceInfoContainer">
-    <h3 *ngIf="stockPriceData" style="font-weight: bold">
-      {{ stockPriceData.price | currency: 'USD' }}
-    </h3>
+    <ng-container *ngIf="isPriceLoading; else showPrice">
+      <h3 style="font-weight: lighter">loading...</h3>
+    </ng-container>
+    <ng-template #showPrice>
+      <h3 *ngIf="stockPriceData" style="font-weight: bold">
+        {{ stockPriceData.price | currency: 'USD' }}
+      </h3>
+    </ng-template>
     <button mat-mini-fab color="primary" (click)="reloadSubject.next()">
       <mat-icon>refresh</mat-icon>
     </button>

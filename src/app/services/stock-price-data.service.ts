@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { StockSymbol } from '../constants/availableStocks';
-import { Observable, delay, of } from 'rxjs';
+import { Observable, delay, of, switchMap, throwError } from 'rxjs';
+
+const getRandomlyTrueOrFalse = () => Math.random() > 0.5;
 
 export interface StockPriceData {
   symbol: StockSymbol;
@@ -31,12 +33,40 @@ export class StockPriceDataService {
     return this.getStockPriceData(symbol, amount);
   }
 
+  getPriceFromSIXWithError(
+    symbol: StockSymbol,
+    amount: number
+  ): Observable<StockPriceData> {
+    const fakeDelayMs = Math.random() * 1000;
+    return this.getPriceFromSIX(symbol, amount).pipe(
+      switchMap(price =>
+        getRandomlyTrueOrFalse()
+          ? throwError(() => new Error('SIX is down'))
+          : of(price)
+      )
+    );
+  }
+
   getPriceFromXETRA(
     symbol: StockSymbol,
     amount: number
   ): Observable<StockPriceData> {
     console.log('StockPriceDataService: loading price from XETRA');
     return this.getStockPriceData(symbol, amount);
+  }
+
+  getPriceFromXETRAWithError(
+    symbol: StockSymbol,
+    amount: number
+  ): Observable<StockPriceData> {
+    const fakeDelayMs = Math.random() * 1000;
+    return this.getPriceFromSIX(symbol, amount).pipe(
+      switchMap(price =>
+        getRandomlyTrueOrFalse()
+          ? throwError(() => new Error('XETRA is down'))
+          : of(price)
+      )
+    );
   }
 
   private getStockPriceData(

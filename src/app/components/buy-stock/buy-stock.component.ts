@@ -25,11 +25,12 @@ export class BuyStockComponent implements OnInit {
   selectedStockAndAmount: StockSymbolAndAmountFormValue | null = null;
   stockPriceData: StockPriceData | null = null;
 
+  // Setting this boolean will control loading state in the template
+  isPriceLoading: boolean = false;
+
   private readonly stockAndAmountSelectionSubject =
     new ReplaySubject<StockSymbolAndAmountFormValue | null>(1);
 
-  // Notice that we have new subject.
-  // The 'next' call to insert the 'reload clicked' event is already done for you (in the template).
   readonly reloadSubject = new BehaviorSubject<void>(undefined);
 
   constructor(private readonly stockPriceDataService: StockPriceDataService) {}
@@ -39,10 +40,10 @@ export class BuyStockComponent implements OnInit {
       this.selectedStockAndAmount = selectedStockAndAmount;
     });
 
-    // TODO: choose a combiner to combine the stockAndAmountSelectionSubject and reloadSubject
+    // TODO add error handling, notice there is no error variable. Use 'getPriceFromSIXWithError()' to simulate errors
+    // TODO add loading logic by setting the isPriceLoading variable
     combineLatest([this.stockAndAmountSelectionSubject, this.reloadSubject])
       .pipe(
-        // TODO: adjust the switchMap. It should receive an array of values now!
         switchMap(([selection, _]) =>
           selection ? this.loadStockPrice(selection) : of(null)
         )
@@ -72,7 +73,6 @@ export class BuyStockComponent implements OnInit {
   private loadStockPrice(
     selection: StockSymbolAndAmountFormValue
   ): Observable<StockPriceData> {
-    // TODO: additionally load the price from XETRA and return the lower price of the two
     return forkJoin([
       this.stockPriceDataService.getPriceFromSIX(
         selection.symbolInput,
