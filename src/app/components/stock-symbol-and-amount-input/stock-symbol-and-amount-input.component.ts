@@ -57,13 +57,14 @@ export class StockSymbolAndAmountInputComponent implements OnInit {
   selectedStockAndAmount: Observable<StockSymbolAndAmountFormValue | null> =
     this.getFormValueOrNull();
 
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method
   ngOnInit(): void {
-    this.stockInfoForm.valueChanges.subscribe(value => {
-      console.log('form value changed to: ', value);
-    });
-    this.stockInfoForm.statusChanges.subscribe(status => {
-      console.log('form status changed to: ', status);
-    });
+    // this.stockInfoForm.valueChanges.subscribe(value => {
+    //   console.log('form value changed to: ', value);
+    // });
+    // this.stockInfoForm.statusChanges.subscribe(status => {
+    //   console.log('form status changed to: ', status);
+    // });
   }
 
   onMinusClick(event: MouseEvent): void {
