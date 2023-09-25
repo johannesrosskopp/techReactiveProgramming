@@ -48,6 +48,34 @@ export class BuyStockComponent implements OnInit {
     private readonly accountService: AccountService
   ) {}
 
+  stockPriceData$: Observable<StockPriceData | null> = combineLatest([
+    this.stockAndAmountSelectionSubject,
+    this.reloadSubject,
+  ]).pipe(
+    tap(() => {
+      this.showAmountNotAvailableWarning = false;
+    }),
+    switchMap(([selection, _]) =>
+      selection ? this.loadStockPrice(selection) : of(null)
+    ),
+    catchError(err => {
+      console.error('Fatal error occured, please reload!');
+      return of(null);
+    }),
+    share()
+  );
+
+  showAmountNotAvailableWarning$: Observable<boolean> =
+    this.stockPriceData$.pipe(
+      switchMap(stockPriceData =>
+        stockPriceData
+          ? this.loadAmountAvailability(stockPriceData.price).pipe(
+              map(isAmountAvailable => !isAmountAvailable)
+            )
+          : of(false)
+      )
+    );
+
   ngOnInit() {
     this.stockAndAmountSelectionSubject.subscribe(selectedStockAndAmount => {
       this.selectedStockAndAmount = selectedStockAndAmount;
@@ -55,19 +83,15 @@ export class BuyStockComponent implements OnInit {
 
     // TODO after you know the price amount, call this.accountService.isAmountAvailable(amount) and use the result
     // TODO this pipe could get too big, try to refactor it
-    combineLatest([this.stockAndAmountSelectionSubject, this.reloadSubject])
-      .pipe(
-        switchMap(([selection, _]) =>
-          selection ? this.loadStockPrice(selection) : of(null)
-        ),
-        catchError(err => {
-          console.error('Fatal error occured, please reload!');
-          return of(null);
-        })
-      )
-      .subscribe(stockPriceData => {
-        this.stockPriceData = stockPriceData;
-      });
+    this.stockPriceData$.subscribe(stockPriceData => {
+      this.stockPriceData = stockPriceData;
+    });
+
+    this.showAmountNotAvailableWarning$.subscribe(
+      showAmountNotAvailableWarning => {
+        this.showAmountNotAvailableWarning = showAmountNotAvailableWarning;
+      }
+    );
   }
 
   onStockAndAmountSelectionChange(
@@ -114,6 +138,19 @@ export class BuyStockComponent implements OnInit {
       }),
       finalize(() => {
         this.isPriceLoading = false;
+      })
+    );
+  }
+
+  private loadAmountAvailability(amount: number): Observable<boolean> {
+    return this.accountService.isAmountAvailable(amount).pipe(
+      tap({
+        subscribe: () => {
+          this.isAmountAvailbilityLoading = true;
+        },
+        finalize: () => {
+          this.isAmountAvailbilityLoading = false;
+        },
       })
     );
   }
