@@ -11,6 +11,7 @@ import {
   forkJoin,
   map,
   of,
+  share,
   switchMap,
   take,
   tap,
@@ -19,6 +20,7 @@ import {
   StockPriceDataService,
   StockPriceData,
 } from 'src/app/services/stock-price-data.service';
+import { AccountService } from 'src/app/services/account.service';
 
 @Component({
   selector: 'app-buy-stock',
@@ -29,7 +31,11 @@ export class BuyStockComponent implements OnInit {
   selectedStockAndAmount: StockSymbolAndAmountFormValue | null = null;
   stockPriceData: StockPriceData | null = null;
 
-  // Setting this boolean will control loading state in the template
+  // TODO Set this to true if the amount is not available
+  showAmountNotAvailableWarning: boolean = false;
+
+  // TODO Set this to true if the amount availbility check is loading
+  isAmountAvailbilityLoading: boolean = false;
   isPriceLoading: boolean = false;
 
   private readonly stockAndAmountSelectionSubject =
@@ -37,15 +43,18 @@ export class BuyStockComponent implements OnInit {
 
   readonly reloadSubject = new BehaviorSubject<void>(undefined);
 
-  constructor(private readonly stockPriceDataService: StockPriceDataService) {}
+  constructor(
+    private readonly stockPriceDataService: StockPriceDataService,
+    private readonly accountService: AccountService
+  ) {}
 
   ngOnInit() {
     this.stockAndAmountSelectionSubject.subscribe(selectedStockAndAmount => {
       this.selectedStockAndAmount = selectedStockAndAmount;
     });
 
-    // TODO add error handling, notice there is no error variable. Use 'getPriceFromSIXWithError()' to simulate errors
-    // TODO add loading logic by setting the isPriceLoading variable
+    // TODO after you know the price amount, call this.accountService.isAmountAvailable(amount) and use the result
+    // TODO this pipe could get too big, try to refactor it
     combineLatest([this.stockAndAmountSelectionSubject, this.reloadSubject])
       .pipe(
         switchMap(([selection, _]) =>

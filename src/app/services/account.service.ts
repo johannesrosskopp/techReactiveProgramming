@@ -12,6 +12,7 @@ export class AccountService {
 
   isAmountAvailable(amount: number): Observable<boolean> {
     const isAmountAvailable = amount <= this.FAKE_AVAILABLE_AMOUNT;
+    console.log('loading amount availability...');
     return of(isAmountAvailable).pipe(delay(this.FAKE_DELAY_MS));
   }
 }
