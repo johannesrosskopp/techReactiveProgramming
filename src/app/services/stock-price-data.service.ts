@@ -27,6 +27,7 @@ export class StockPriceDataService {
     symbol: StockSymbol,
     amount: number
   ): Observable<StockPriceData> {
+    console.log('StockPriceDataService: loading price from SIX');
     return this.getStockPriceData(symbol, amount);
   }
 
@@ -34,6 +35,7 @@ export class StockPriceDataService {
     symbol: StockSymbol,
     amount: number
   ): Observable<StockPriceData> {
+    console.log('StockPriceDataService: loading price from XETRA');
     return this.getStockPriceData(symbol, amount);
   }
 
