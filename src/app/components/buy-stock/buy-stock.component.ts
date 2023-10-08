@@ -4,6 +4,7 @@ import {
   BehaviorSubject,
   EMPTY,
   Observable,
+  OperatorFunction,
   ReplaySubject,
   catchError,
   combineLatest,
@@ -31,10 +32,8 @@ export class BuyStockComponent implements OnInit {
   selectedStockAndAmount: StockSymbolAndAmountFormValue | null = null;
   stockPriceData: StockPriceData | null = null;
 
-  // TODO Set this to true if the amount is not available
   showAmountNotAvailableWarning: boolean = false;
 
-  // TODO Set this to true if the amount availbility check is loading
   isAmountAvailbilityLoading: boolean = false;
   isPriceLoading: boolean = false;
 
@@ -52,11 +51,15 @@ export class BuyStockComponent implements OnInit {
     this.stockAndAmountSelectionSubject,
     this.reloadSubject,
   ]).pipe(
+    // added for your convenience
+    map(([selection, _]) => selection),
     tap(() => {
       this.showAmountNotAvailableWarning = false;
     }),
-    switchMap(([selection, _]) =>
-      selection ? this.loadStockPrice(selection) : of(null)
+    // TODO: add switchMapKeep and usw this.stockPriceDataService.loadCapConfig(selection.symbolInput)
+    // to support the following code
+    switchMap(([selection, config]) =>
+      selection && config?.isOk ? this.loadStockPrice(selection) : of(null)
     ),
     catchError(err => {
       console.error('Fatal error occured, please reload!');
@@ -81,8 +84,6 @@ export class BuyStockComponent implements OnInit {
       this.selectedStockAndAmount = selectedStockAndAmount;
     });
 
-    // TODO after you know the price amount, call this.accountService.isAmountAvailable(amount) and use the result
-    // TODO this pipe could get too big, try to refactor it
     this.stockPriceData$.subscribe(stockPriceData => {
       this.stockPriceData = stockPriceData;
     });

@@ -69,6 +69,10 @@ export class StockPriceDataService {
     );
   }
 
+  loadCapConfig(symbolInput: string): Observable<{ isOk: boolean }> {
+    return of({ isOk: true });
+  }
+
   private getStockPriceData(
     symbol: StockSymbol,
     amount: number
