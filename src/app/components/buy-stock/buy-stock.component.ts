@@ -23,6 +23,12 @@ import {
 } from 'src/app/services/stock-price-data.service';
 import { AccountService } from 'src/app/services/account.service';
 
+function switchMapKeep<T, R>(
+  inner: (input: T) => Observable<R>
+): OperatorFunction<T, [T, R]> {
+  return (source: Observable<T>): Observable<[T, R]> =>
+    source.pipe(switchMap(a => inner(a).pipe(map(b => [a, b] as [T, R]))));
+}
 @Component({
   selector: 'app-buy-stock',
   templateUrl: './buy-stock.component.html',
@@ -58,6 +64,11 @@ export class BuyStockComponent implements OnInit {
     }),
     // TODO: add switchMapKeep and usw this.stockPriceDataService.loadCapConfig(selection.symbolInput)
     // to support the following code
+    switchMapKeep(selection =>
+      selection
+        ? this.stockPriceDataService.loadCapConfig(selection.symbolInput)
+        : of(null)
+    ),
     switchMap(([selection, config]) =>
       selection && config?.isOk ? this.loadStockPrice(selection) : of(null)
     ),
