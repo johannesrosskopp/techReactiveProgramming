@@ -45,10 +45,6 @@ export class AppComponent implements OnInit {
     return a + b;
   };
 
-  lamdaWithoutParans = a => {
-    return a + 1;
-  };
-
   lamdaWithoutReturn = (a: number, b: number) => a + b;
 
   lamdaWithReturnObject = (a: number, b: number) => ({
@@ -61,6 +57,10 @@ export class AppComponent implements OnInit {
 
   lamdaWithDestructuredArrayInput = ([first, second]: string[]) => {
     return first + second;
+  };
+
+  lamdaWithoutParans: (a: number) => number = a => {
+    return a + 1;
   };
 }
 
