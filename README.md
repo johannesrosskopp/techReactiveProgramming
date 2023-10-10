@@ -1,27 +1,41 @@
-# TechReactiveProgramming
+# Hands-on for TECH Reactive Programming with RxJS
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.5.
+> Date: 13.10.2023
 
-## Development server
+A repository containing a simple showcase Angular App for TECH Reactive Programming with RxJS.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+The repo contains branches for every hands-on. These branches are based on each other.
+ 
+> [!WARNING]
+> Caution: The branches contain solutions for the previous hands-ons. Peeking will decrease your fun!
 
-## Code scaffolding
+## Running
+Just make sure you have 
+* nodejs (16+)
+* npm (or similar package manager) (reasonable recent version)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+installed. 
 
-## Build
+In the cloned repository, run  
+`npm install`  
+`npm start`
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Checkout the Angular App at `localhost:4200`.
 
-## Running unit tests
+## Developing
+### Visual Studio Code
+Recommended IDE is VS Code because the repo contains VS Code settings for on-save linting and prettifying.  
+Make sure you have the following extensions installed:
+* Angular Language Service
+* Prettier - Code Formatter
+* EsLint
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### Intellij
+Alternatively, you can use Intellij Ultimate or WebStorm (Community Version might not work because of the lack for Typescript support).  
+Make sure you have the following plugins added:
+* "Angular and AngularJS Plugin" 
+* Prettier
+* Eslint
 
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+You will likely need to configure the plugins in the settings.  
+Additinoally, you have to set the settings for prettifying and linting yourself. 
