@@ -43,6 +43,17 @@ export class BuyStockComponent implements OnInit {
 
   readonly reloadSubject = new BehaviorSubject<void>(undefined);
 
+  private stockPriceData$ = new BehaviorSubject<StockPriceData | null>(null);
+  private pricesAllowed$ = this.stockPriceData$.pipe(
+    switchMap(stockPriceData => {
+      if (!stockPriceData) {
+        return of(null);
+      }
+      return this.accountService.isAmountAvailable(stockPriceData.price);
+    }),
+    tap(bool => (this.showAmountNotAvailableWarning = !bool))
+  );
+
   constructor(
     private readonly stockPriceDataService: StockPriceDataService,
     private readonly accountService: AccountService
@@ -53,10 +64,12 @@ export class BuyStockComponent implements OnInit {
       this.selectedStockAndAmount = selectedStockAndAmount;
     });
 
+    this.pricesAllowed$.subscribe();
     // TODO after you know the price amount, call this.accountService.isAmountAvailable(amount) and use the result
     // TODO this pipe could get too big, try to refactor it
     combineLatest([this.stockAndAmountSelectionSubject, this.reloadSubject])
       .pipe(
+        tap(() => (this.showAmountNotAvailableWarning = false)),
         switchMap(([selection, _]) =>
           selection ? this.loadStockPrice(selection) : of(null)
         ),
@@ -67,6 +80,7 @@ export class BuyStockComponent implements OnInit {
       )
       .subscribe(stockPriceData => {
         this.stockPriceData = stockPriceData;
+        this.stockPriceData$.next(stockPriceData);
       });
   }
 
@@ -91,7 +105,7 @@ export class BuyStockComponent implements OnInit {
     selection: StockSymbolAndAmountFormValue
   ): Observable<StockPriceData | null> {
     return forkJoin([
-      this.stockPriceDataService.getPriceFromSIXWithError(
+      this.stockPriceDataService.getPriceFromSIX(
         selection.symbolInput,
         selection.amountInput
       ),
