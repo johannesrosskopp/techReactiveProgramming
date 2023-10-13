@@ -7,6 +7,7 @@ import {
   combineLatest,
   forkJoin,
   map,
+  max,
   of,
   switchMap,
   take,
@@ -41,12 +42,16 @@ export class BuyStockComponent implements OnInit {
     });
 
     // TODO: choose a combiner to combine the stockAndAmountSelectionSubject and reloadSubject
-    this.stockAndAmountSelectionSubject
+    combineLatest([this.stockAndAmountSelectionSubject, this.reloadSubject])
       .pipe(
         // TODO: adjust the switchMap. It should receive an array of values now!
-        switchMap(selection =>
-          selection ? this.loadStockPrice(selection) : of(null)
-        )
+        switchMap(([selection, _]) =>
+          selection ? this.loadStockPrice(selection) : of([null, null])
+        ),
+        map(([price1, price2]) => {
+          if (!price1 || !price2) return null;
+          return price1 >= price2 ? price2 : price1;
+        })
       )
       .subscribe(stockPriceData => {
         this.stockPriceData = stockPriceData;
@@ -72,11 +77,17 @@ export class BuyStockComponent implements OnInit {
 
   private loadStockPrice(
     selection: StockSymbolAndAmountFormValue
-  ): Observable<StockPriceData> {
+  ): Observable<StockPriceData[]> {
     // TODO: additionally load the price from XETRA and return the lower price of the two
-    return this.stockPriceDataService.getPriceFromSIX(
-      selection.symbolInput,
-      selection.amountInput
-    );
+    return forkJoin([
+      this.stockPriceDataService.getPriceFromSIX(
+        selection.symbolInput,
+        selection.amountInput
+      ),
+      this.stockPriceDataService.getPriceFromSIX(
+        selection.symbolInput,
+        selection.amountInput
+      ),
+    ]);
   }
 }
