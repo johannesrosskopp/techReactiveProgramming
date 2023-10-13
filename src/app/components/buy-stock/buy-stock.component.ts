@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { StockSymbolAndAmountFormValue } from '../stock-symbol-and-amount-input/stock-symbol-and-amount-input.component';
-import { Observable, ReplaySubject, of, switchMap, take } from 'rxjs';
+import { Observable, ReplaySubject, filter, of, switchMap, take } from 'rxjs';
 import {
   StockPriceDataService,
   StockPriceData,
@@ -29,8 +29,21 @@ export class BuyStockComponent implements OnInit {
 
     // TODO use stockPriceDataService and an async mapper to load the stock price from SIX
     // then subscribe and set the stockPriceData variable
-    // this.stockAndAmountSelectionSubject
-    //   .pipe(
+    this.stockAndAmountSelectionSubject
+      .pipe(
+        switchMap(selectedStockAndAmount => {
+          if (!selectedStockAndAmount) {
+            return of(null);
+          }
+          return this.stockPriceDataService.getPriceFromSIX(
+            selectedStockAndAmount?.symbolInput,
+            selectedStockAndAmount?.amountInput
+          );
+        })
+      )
+      .subscribe(stockPriceData => {
+        this.stockPriceData = stockPriceData;
+      });
   }
 
   onStockAndAmountSelectionChange(
