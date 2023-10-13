@@ -4,12 +4,15 @@ import {
   BehaviorSubject,
   Observable,
   ReplaySubject,
+  catchError,
   combineLatest,
+  finalize,
   forkJoin,
   map,
   of,
   switchMap,
   take,
+  tap,
 } from 'rxjs';
 import {
   StockPriceDataService,
@@ -44,12 +47,15 @@ export class BuyStockComponent implements OnInit {
     // TODO add loading logic by setting the isPriceLoading variable
     combineLatest([this.stockAndAmountSelectionSubject, this.reloadSubject])
       .pipe(
+        tap(console.log),
+        tap(() => (this.isPriceLoading = true)),
         switchMap(([selection, _]) =>
           selection ? this.loadStockPrice(selection) : of(null)
         )
       )
       .subscribe(stockPriceData => {
         this.stockPriceData = stockPriceData;
+        this.isPriceLoading = false;
       });
   }
 
@@ -72,9 +78,9 @@ export class BuyStockComponent implements OnInit {
 
   private loadStockPrice(
     selection: StockSymbolAndAmountFormValue
-  ): Observable<StockPriceData> {
+  ): Observable<StockPriceData | null> {
     return forkJoin([
-      this.stockPriceDataService.getPriceFromSIX(
+      this.stockPriceDataService.getPriceFromSIXWithError(
         selection.symbolInput,
         selection.amountInput
       ),
@@ -85,7 +91,11 @@ export class BuyStockComponent implements OnInit {
     ]).pipe(
       map(([sixPrice, xetraPrice]) =>
         sixPrice.price < xetraPrice.price ? sixPrice : xetraPrice
-      )
+      ),
+      catchError(error => {
+        console.error(error);
+        return of(null);
+      })
     );
   }
 }
