@@ -4,8 +4,10 @@ import {
   BehaviorSubject,
   Observable,
   ReplaySubject,
+  Subject,
   catchError,
   combineLatest,
+  concatMap,
   finalize,
   forkJoin,
   map,
@@ -57,6 +59,33 @@ export class BuyStockComponent implements OnInit {
         this.stockPriceData = stockPriceData;
         this.isPriceLoading = false;
       });
+
+    let testsubj = new Subject<string>();
+    let delaySubject = new Subject<string>();
+    testsubj
+      .pipe(
+        tap({
+          next: val => console.log(`Tap Test ${val}`),
+          error: val => console.log(`Tap Test Error ${val}`),
+        }),
+        switchMap(val => {
+          setTimeout(() => delaySubject.next(val), 2000);
+          return delaySubject;
+        }),
+        tap({
+          next: val => console.log(`Tap2 Test ${val}`),
+          error: val => console.log(`Tap Test Error2 ${val}`),
+        })
+      )
+      .subscribe(val => console.log(`Subscribe TEST ${val}`));
+
+    for (let i = 0; i < 10; i++) {
+      testsubj.next(`input ${i}`);
+    }
+    testsubj.error('error_input');
+    for (let i = 0; i < 10; i++) {
+      testsubj.next(`input ${i}`);
+    }
   }
 
   onStockAndAmountSelectionChange(
